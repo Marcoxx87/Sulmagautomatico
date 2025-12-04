@@ -1,0 +1,389 @@
+<?php
+require_once __DIR__ . '/auth.php';
+?>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ultimi Pallet in Carwash</title>
+  <link rel="icon" href="refresco_logo.jpg" type="image/jpg">
+  <link rel="apple-touch-icon" href="refresco_logo.jpg">
+  <meta name="theme-color" content="#3BB9FF">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root{--brand:#3BB9FF;--ok:#2e7d32;--warn:#f9a825;--danger:#d32f2f;--ink:#1b2440;--muted:#5a6a85}
+    body{font-family:"Segoe UI",sans-serif;background:#fff;color:#333;margin:0;padding:0 10px 20px}
+    .header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:10px;padding-top:6px}
+    .logo-left img{height:40px}
+    h1{margin:0;font-size:22px;flex-grow:1;text-align:center}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .controls img{height:30px}
+    .btn{padding:8px 12px;border-radius:6px;border:none;font-weight:700;cursor:pointer;font-size:14px}
+    .btn-export{background:#4caf50;color:#fff}
+    .btn-export:hover{background:#388e3c}
+    .btn-dark{background:#333;color:#fff}
+    .btn-dark:hover{background:#555}
+    .btn-home{background:#1976d2;color:#fff}
+    .btn-home:hover{background:#0d47a1}
+
+    .summary{background:#fff;border:2px solid #e0e0e0;border-radius:12px;padding:14px;margin:16px 0 0;text-align:center}
+    .summary .big{font-weight:900;font-size:22px;color:#1b5e20;margin-bottom:6px}
+    .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center}
+
+    .chip{display:inline-flex;align-items:center;gap:8px;border:1px solid #cfd8dc;background:#fafafa;border-radius:999px;padding:6px 12px;color:#1b5e20}
+    .chip .lab{font-weight:700;opacity:.85}
+    .chip .val{font-weight:900}
+
+    .chip.l1{font-size:16px;padding:8px 14px}
+    .chip.l2{font-size:12px}
+    .chip.l1.cw{border-color:green}
+    .chip.l1.down{border-color:#b0bec5}
+    .chip.l2.CW{border-color:green}
+
+    .filters{display:flex;flex-wrap:wrap;gap:15px;margin:12px 0 20px;background:#e3f2fd;padding:10px;border-radius:8px}
+    .filter-group{display:flex;flex-direction:column;font-size:14px;font-weight:bold;color:#0d47a1;min-width:160px;flex:1}
+    .filter-group input,.filter-group select{font-weight:normal;padding:6px;border-radius:4px;border:1px solid #90caf9;background:#fff}
+
+    .table-container{overflow-x:auto}
+    table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.05);min-width:1200px}
+    th,td{border:1px solid #ccc;padding:8px;text-align:left}
+    th{background:#3BB9FF;text-transform:uppercase;color:#fff}
+    tbody tr.clickable-row{cursor:pointer;transition:background-color .3s ease}
+    tbody tr.clickable-row:hover{background:#d0ebff}
+    .details{background:#eef9ff;font-size:.9em;display:none}
+    .bold{font-weight:700}
+    #loading{padding:6px 0}
+
+    body.dark{background:#121212;color:#eee}
+    body.dark table{background:#1e1e1e}
+    body.dark th{background:#333;color:#fff}
+    body.dark td{color:#ccc}
+    body.dark .filters{background:#333;color:#fff}
+    body.dark .filter-group input,body.dark .filter-group select{background:#555;color:#fff;border-color:#777}
+    body.dark .summary{background:#0b0f12;border-color:#2e7d32}
+    body.dark .chip{background:#0f1417;border-color:#375a63;color:#d6f6ff}
+
+    @media (max-width:768px){
+      .logo-left img{height:30px}
+      h1{font-size:18px}
+      th,td{font-size:12px;padding:6px}
+      .controls{justify-content:center}
+      .filters{flex-direction:column}
+      .filter-group{width:100%}
+      .summary .big{font-size:19px}
+      .chip.l1{font-size:15px}
+      .chip.l2{font-size:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo-left"><a href="index.php"><img src="refresco_logo.jpg" alt="Logo"></a></div>
+    <h1>Ultimi Pallet in Carwash</h1>
+    <div class="controls">
+      <a href="index.php" class="btn btn-home">Home</a>
+      <button id="dark-toggle" class="btn btn-dark">Modalità Scura</button>
+      <button id="export-btn" class="btn btn-export">Esporta</button>
+      <img src="Carwash.jpg" alt="Carwash Logo">
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label for="filter-date">Data inserimento da</label>
+      <input type="datetime-local" id="filter-date"/>
+    </div>
+    <div class="filter-group">
+      <label for="filter-date-to">Data inserimento a</label>
+      <input type="datetime-local" id="filter-date-to"/>
+    </div>
+    <div class="filter-group">
+      <label for="filter-lpn">LPN contiene</label>
+      <input type="text" id="filter-lpn"/>
+    </div>
+    
+    <div class="filter-group">
+      <label for="filter-source">Sorgente</label>
+      <input type="text" id="filter-source" placeholder="es. PICK_LINEA_84, 84, etc..."/>
+    </div>
+    <div class="filter-group">
+      <label for="filter-location">Posizione</label>
+      <select id="filter-location">
+        <option value="">Tutte</option>
+        <option value="CW">CW</option>
+        <option value="CW_DOWN">CW_DOWN</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label for="row-count">Mostra righe</label>
+      <select id="row-count">
+        <option value="10">10</option>
+        <option value="100" selected>100</option>
+        <option value="500">500</option>
+        <option value="1000">1000</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="loading">Caricamento dati...</div>
+
+  <div class="table-container">
+    <table id="data-table" style="display:none">
+      <thead>
+        <tr>
+          <th>Data Inserimento</th>
+          <th>Sorgente</th>
+          <th>Destinazione</th>
+          <th>LPN</th>
+          <th>SKU</th>
+          <th>Descrizione</th>
+          <th>Motivazione</th>
+          <th>Quantità</th>
+          <th>Fronte</th>
+          <th>Retro</th>
+          <th>Sinistra</th>
+          <th>Destra</th>
+        </tr>
+      </thead>
+      <tbody id="table-body"></tbody>
+    </table>
+  </div>
+
+  <div id="total-count" style="margin-top:10px"></div>
+
+  <div class="summary" id="summary">
+    <div class="row"><span class="big" id="sum-title">Oggi: —</span></div>
+    <div class="row" id="sum-chips-l1"></div>
+    <div class="row" id="sum-chips-l2"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    const supabaseUrl='https://orttbxpxuohxfsqwrzcy.supabase.co';
+    const supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs';
+    const supabase=window.supabase.createClient(supabaseUrl,supabaseKey);
+    const TABLE_NAME='pallet_storico_new';
+
+    let currentData=[];
+
+    function col(row,...keys){for(const k of keys){if(row[k]!==undefined&&row[k]!==null)return row[k]}return null}
+    function startOfTodayISO(){const d=new Date();d.setHours(0,0,0,0);return d.toISOString()}
+    function nowISO(){return new Date().toISOString()}
+
+    
+    async function loadData(){
+      const loadingEl=document.getElementById('loading');
+      loadingEl.style.display='block';
+      loadingEl.innerText='Caricamento dati...';
+      document.getElementById('data-table').style.display='none';
+      document.getElementById('table-body').innerHTML='';
+
+      const dateFrom=document.getElementById('filter-date').value || null;
+      const dateTo=document.getElementById('filter-date-to').value || null;
+      const lpnFilter=(document.getElementById('filter-lpn').value||'').trim();
+      const sourceFilter=(document.getElementById('filter-source').value||'').trim();
+      const locationFilter=document.getElementById('filter-location').value || null;
+      const rowCount=parseInt(document.getElementById('row-count').value);
+
+      let q=supabase.from(TABLE_NAME).select('*').order('EnterDateTime',{ascending:false});
+
+      if(dateFrom) q=q.gte('EnterDateTime',dateFrom);
+      if(dateTo)   q=q.lte('EnterDateTime',dateTo);
+      if(lpnFilter) q=q.ilike('Lpn',`%${lpnFilter}%`);
+      if(sourceFilter) q=q.ilike('Partenza',`%${sourceFilter}%`);   
+      if(locationFilter) q=q.eq('StorageLocation',locationFilter);  
+      if(Number.isFinite(rowCount)) q=q.limit(rowCount);
+
+      const {data,error}=await q;
+      if(error){loadingEl.innerText='Errore: '+error.message;return}
+
+      currentData=data||[];
+      renderTable(currentData);
+
+      
+      computeTodaySummary();
+    }
+
+   
+    async function computeTodaySummary(){
+      const from=startOfTodayISO();
+      const to=nowISO();
+      const { data:list, error } = await supabase
+        .from(TABLE_NAME)
+        .select('EnterDateTime, StorageLocation, Partenza')
+        .gte('EnterDateTime', from)
+        .lte('EnterDateTime', to);
+
+      if(error){ console.warn('Errore riepilogo:', error.message); return; }
+
+      const cwMain=(list||[]).filter(x=>String(col(x,'StorageLocation')).toUpperCase()==='CW');
+      const cwDown=(list||[]).filter(x=>String(col(x,'StorageLocation')).toUpperCase()==='CW_DOWN');
+
+      const wanted=[
+        {key:'PICK_CO_PACK',label:'CO_PACK'},
+        {key:'PICK_LINEA_84',label:'Linea 84'},
+        {key:'PICK_LINEA_83',label:'Linea 83'},
+        {key:'PICK_LINEA_82',label:'Linea 82'},
+        {key:'PICK_LINEA_81',label:'Linea 81'}
+      ];
+      const srcMap={};
+      cwMain.forEach(x=>{
+        const s=(col(x,'Partenza')||'').toString().trim()||'—';
+        srcMap[s]=(srcMap[s]||0)+1;
+      });
+      const sel=wanted.map(w=>({label:w.label,val:(srcMap[w.key]||0)}));
+      const selSum=sel.reduce((a,b)=>a+b.val,0);
+      const other=Math.max(0,cwMain.length-selSum);
+
+      document.getElementById('sum-title').textContent=`Oggi: ${cwMain.length+cwDown.length} pallet in Carwash`;
+
+      const l1=[
+        {label:'CW',val:cwMain.length,cls:'cw'},
+        {label:'DOWN',val:cwDown.length,cls:'down'}
+      ];
+      document.getElementById('sum-chips-l1').innerHTML=l1
+        .filter(c=>c.val>0)
+        .map(c=>`<span class="chip l1 ${c.cls}"><span class="lab">${c.label}</span><span class="val">${c.val}</span></span>`).join(' ');
+
+      const l2=[...sel,{label:'Altro',val:other}];
+      document.getElementById('sum-chips-l2').innerHTML=l2
+        .filter(c=>c.val>0)
+        .map(c=>`<span class="chip l2"><span class="lab">${c.label}</span><span class="val">${c.val}</span></span>`).join(' ');
+    }
+
+   
+    function renderTable(data){
+      const loading=document.getElementById('loading');
+      const tbody=document.getElementById('table-body');
+      tbody.innerHTML='';
+
+      if(!data.length){loading.innerText='Nessun dato trovato.';return}
+
+      data.forEach(row=>{
+        const tr=document.createElement('tr');
+        tr.classList.add('clickable-row');
+
+        const enterDateTime=col(row,'EnterDateTime');
+        const sorgente=col(row,'Partenza');
+        const destinazione=col(row,'StorageLocation'); 
+        const lpn=col(row,'Lpn');
+        const sku=col(row,'Sku');
+        const itemDesc=col(row,'ItemDescription');
+        const lot=col(row,'Lot');
+        const qty=col(row,'Quantity');
+        const fronte=col(row,'Fronte');
+        const retro=col(row,'Retro');
+        const sinistra=col(row,'Sinistra');
+        const destra=col(row,'Destra');
+
+        tr.innerHTML=`
+          <td>${formatDate(enterDateTime)}</td>
+          <td>${sorgente??'-'}</td>
+          <td>${destinazione??'-'}</td>
+          <td class="bold">${lpn??'-'}</td>
+          <td class="bold">${sku??'-'}</td>
+          <td>${itemDesc??'-'}</td>
+          <td>${lot??'-'}</td>
+          <td>${qty??'-'}</td>
+          <td>${fronte??'-'}</td>
+          <td>${retro??'-'}</td>
+          <td>${sinistra??'-'}</td>
+          <td>${destra??'-'}</td>
+        `;
+
+        const detail=document.createElement('tr');
+        detail.classList.add('details');
+        detail.style.display='none';
+
+        const h=col(row,'Height'), l=col(row,'Length'), w=col(row,'Width'), peso=col(row,'Weight');
+        const ih=col(row,'ItemHeight'), il=col(row,'ItemLength'), iw=col(row,'ItemWidth'), ip=col(row,'ItemWeight');
+        const lpn2=col(row,'Lpn2'), loadAid=col(row,'LoadAid');
+
+        detail.innerHTML=`
+          <td colspan="12">
+            <strong>Altezza:</strong> ${h??'-'} ${ih?`(${ih})`:''} &nbsp;|&nbsp;
+            <strong>Lunghezza:</strong> ${l??'-'} ${il?`(${il})`:''} &nbsp;|&nbsp;
+            <strong>Larghezza:</strong> ${w??'-'} ${iw?`(${iw})`:''} &nbsp;|&nbsp;
+            <strong>Peso:</strong> ${peso??'-'} ${ip?`(${ip})`:''} &nbsp;|&nbsp;
+            <strong>Debordo:</strong> Fronte ${fronte??'-'} | Retro ${retro??'-'} | Sinistra ${sinistra??'-'} | Destra ${destra??'-'} &nbsp;|&nbsp;
+            <strong>LPN2:</strong> ${lpn2??'-'} &nbsp;|&nbsp;
+            <strong>Tipo:</strong> ${loadAid??'-'}
+          </td>
+        `;
+
+        tr.addEventListener('click',()=>{detail.style.display=detail.style.display==='table-row'?'none':'table-row'});
+
+        tbody.appendChild(tr);
+        tbody.appendChild(detail);
+      });
+
+      loading.style.display='none';
+      document.getElementById('data-table').style.display='table';
+      document.getElementById('total-count').innerText=`Totale righe visualizzate: ${data.length}`;
+    }
+
+    
+    function exportToExcel(){
+      const rows=currentData.map(row=>{
+        const out={}; Object.keys(row||{}).forEach(k=>out[k]=row[k]);
+        out['Data Inserimento']=formatDate(col(row,'EnterDateTime'));
+        out['Sorgente']=col(row,'Partenza');
+        out['Destinazione']=col(row,'StorageLocation'); 
+        out['LPN']=col(row,'Lpn');
+        out['SKU']=col(row,'Sku');
+        out['Descrizione']=col(row,'ItemDescription');
+        out['Motivazione']=col(row,'Lot');
+        out['Quantità']=col(row,'Quantity');
+        out['Fronte']=col(row,'Fronte');
+        out['Retro']=col(row,'Retro');
+        out['Sinistra']=col(row,'Sinistra');
+        out['Destra']=col(row,'Destra');
+        out['Alt. Misurata']=col(row,'Height');
+        out['Lun. Misurata']=col(row,'Length');
+        out['Largh. Misurata']=col(row,'Width');
+        out['Peso Misurato']=col(row,'Weight');
+        out['Alt. Prevista']=col(row,'ItemHeight');
+        out['Lun. Prevista']=col(row,'ItemLength');
+        out['Largh. Prevista']=col(row,'ItemWidth');
+        out['Peso Previsto']=col(row,'ItemWeight');
+        out['LPN2']=col(row,'Lpn2');
+        out['Tipo']=col(row,'LoadAid');
+        return out;
+      });
+
+      const ws=XLSX.utils.json_to_sheet(rows);
+      const wb=XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb,ws,'Pallet Carwash');
+      XLSX.writeFile(wb,'pallet_carwash.xlsx');
+    }
+
+    
+    function formatDate(s){if(!s)return'-';const d=new Date(s);return isNaN(d)?'-':d.toLocaleString('it-IT')}
+    function toggleDarkMode(){document.body.classList.toggle('dark');localStorage.setItem('darkMode',document.body.classList.contains('dark'))}
+    if(localStorage.getItem('darkMode')==='true'){document.body.classList.add('dark')}
+
+  
+    document.getElementById('filter-date').addEventListener('change',loadData);
+    document.getElementById('filter-date-to').addEventListener('change',loadData);
+    document.getElementById('filter-lpn').addEventListener('input',()=>debounceLoad());
+    document.getElementById('filter-source').addEventListener('input',()=>debounceLoad());
+    document.getElementById('filter-location').addEventListener('change',loadData);
+    document.getElementById('row-count').addEventListener('change',loadData);
+    document.getElementById('export-btn').addEventListener('click',exportToExcel);
+    document.getElementById('dark-toggle').addEventListener('click',toggleDarkMode);
+
+   
+    let _debTimeout=null;
+    function debounceLoad(){
+      clearTimeout(_debTimeout);
+      _debTimeout=setTimeout(loadData, 300);
+    }
+
+   
+    loadData();
+    setInterval(()=>loadData(),300000);
+  </script>
+</body>
+</html>
