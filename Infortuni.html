@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Indicatori Infortuni Sulmona</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root{--brand-orange:#e07b00;--brand-green:#1f8a43;--brand-green-2:#2aa159;--bg:#f6f8fb;--card:#ffffff;--text:#1f2937;--muted:#6b7280;--ring:#e5e7eb}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:var(--text);background:var(--bg)}
+    .topbar{position:sticky;top:0;z-index:10;background:var(--brand-orange);color:#fff;box-shadow:0 2px 12px rgba(0,0,0,.08)}
+    .topbar-inner{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:10px 16px}
+    .brand img{height:48px;width:auto;display:block}
+    .sec-logo img{height:60px;width:auto;display:block;filter:drop-shadow(0 2px 4px rgba(0,0,0,.12))}
+    .title{font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:center;font-size:clamp(18px,2.6vw,28px)}
+    .container{max-width:1200px;margin:18px auto;padding:0 16px}
+    .grid{display:grid;grid-template-columns:340px 1fr;gap:16px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:2px solid var(--brand-green);border-radius:16px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,.04)}
+    .card h3{margin:0 0 8px;font-size:18px;font-weight:800;color:var(--brand-green)}
+    .muted{color:var(--muted)}
+    .btn{border:0;border-radius:12px;padding:10px 14px;font-weight:700;cursor:pointer;transition:.2s transform ease,.2s box-shadow ease;box-shadow:0 4px 10px rgba(0,0,0,.05)}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:var(--brand-green);color:#fff}
+    .btn-outline{background:#fff;color:#111;border:2px solid var(--ring)}
+    .btn[disabled]{opacity:.6;cursor:not-allowed}
+    .row{display:grid;gap:12px}
+    .row.two{grid-template-columns:1fr 1fr}
+    .row.three{grid-template-columns:repeat(3,1fr)}
+    @media (max-width:720px){.row.two,.row.three{grid-template-columns:1fr}}
+    label{display:grid;gap:6px;font-weight:600}
+    input,select{padding:10px 12px;font-size:16px;border-radius:12px;border:2px solid var(--ring);outline:none;background:#fff}
+    input:focus,select:focus{border-color:var(--brand-green-2);box-shadow:0 0 0 3px rgba(42,161,89,.15)}
+    .locked input[data-editable="true"]{opacity:.6}
+    .kpi{display:flex;align-items:center;justify-content:space-between;gap:8px;border:2px solid var(--brand-green);border-radius:16px;padding:14px 16px;background:#fff}
+    .kpi .val{font-size:28px;font-weight:800;color:#c1121f}
+    .status{margin-top:10px;font-weight:600}
+    .footer-note{margin-top:12px;font-size:12px;color:var(--muted)}
+    .chart-wrap{padding:8px;border:2px dashed var(--ring);border-radius:14px;background:#fff}
+    .pw-row{display:flex;gap:10px;align-items:center}
+    .pw-row input{flex:1;min-width:0}
+    .pw-toggle{display:inline-flex;gap:6px;align-items:center;font-size:14px;color:#333;white-space:nowrap}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><img src="refresco_logo.jpg" alt="Refresco" /></div>
+      <div class="title">Indicatori Infortuni Sulmona</div>
+      <div class="sec-logo"><img src="logo_sicurezza.png" alt="Sicurezza"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="grid">
+      <div class="col-left">
+        <div class="card" id="lock-card">
+          <h3>Modalità modifica</h3>
+          <div class="row">
+            <div class="pw-row">
+              <input type="password" id="edit-password" placeholder="Inserisci password" />
+              <label class="pw-toggle"><input type="checkbox" id="togglePw"> Mostra</label>
+            </div>
+            <div class="row two">
+              <button class="btn btn-primary" id="unlock">Sblocca</button>
+              <button class="btn btn-outline" id="lock" disabled>Blocca</button>
+            </div>
+          </div>
+          <div id="lock-status" class="status muted">Bloccato: sola lettura</div>
+          <div class="footer-note">Nota: per la password contattare Rspp Sulmona.</div>
+        </div>
+
+        <div class="card">
+          <h3>Stato rapido</h3>
+          <div class="kpi"><span class="muted">Puoi salvare?</span><span id="kpi-edit" class="val">NO</span></div>
+        </div>
+      </div>
+
+      <div class="col-right">
+        <div class="card">
+          <h3>Dati indicatori</h3>
+          <form id="metrics-form" class="locked">
+            <div class="row two">
+              <label>Anno <input type="number" id="anno" value="2025" min="2000" max="2100" /></label>
+              <label>Mese (1–12, vuoto = annuale) <input type="number" id="mese" min="1" max="12" /></label>
+            </div>
+
+            <div class="row two">
+              <label>Data ultimo infortunio
+                <input type="date" id="data_ultimo_infortunio" data-editable="true"/>
+              </label>
+            </div>
+
+            <div class="row three">
+              <label>Numero infortuni <input type="number" id="numero_infortuni" min="0" value="0" data-editable="true"/></label>
+              <label>Giorni persi per infortunio <input type="number" id="giorni_persi_infortunio" min="0" value="0" data-editable="true"/></label>
+              <label>Segnalazioni del mese <input type="number" id="segnalazioni_mese" min="0" value="0" data-editable="true"/></label>
+            </div>
+            <div class="row three">
+              <label>Tot segnalazioni anno <input type="number" id="segnalazioni_totali_anno" min="0" value="0" data-editable="true"/></label>
+              <label>% chiusura segnalazioni anno <input type="number" id="percentuale_chiusura_anno" min="0" max="100" step="0.01" value="0" data-editable="true"/></label>
+            </div>
+
+            <div class="row two">
+              <button class="btn btn-outline" type="button" id="load">Carica</button>
+              <button class="btn btn-primary" type="submit" id="save" disabled>Salva</button>
+            </div>
+            <div id="status" class="status muted"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h3>Trend ultimi 12 mesi</h3>
+          <div class="row two">
+            <label>Metrica
+              <select id="metric">
+                <option value="numero_infortuni">Numero infortuni</option>
+                <option value="segnalazioni_mese">Segnalazioni del mese</option>
+                <option value="giorni_persi_infortunio">Giorni persi per infortunio</option>
+                <option value="segnalazioni_totali_anno">Tot segnalazioni anno</option>
+                <option value="percentuale_chiusura_anno">% chiusura segnalazioni</option>
+              </select>
+            </label>
+            <label>Tipo grafico
+              <select id="chartType">
+                <option value="line">Lineare</option>
+                <option value="bar">Barre</option>
+              </select>
+            </label>
+          </div>
+          <div class="chart-wrap"><canvas id="trendChart" height="120"></canvas></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const supabaseUrl='https://orttbxpxuohxfsqwrzcy.supabase.co';
+    const supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs';
+    const supabase=window.supabase.createClient(supabaseUrl,supabaseKey);
+    const EDIT_PASSWORD='Debora';
+    const el=id=>document.getElementById(id);
+    const form=el('metrics-form'); const saveBtn=el('save'); const kpiEdit=el('kpi-edit');
+    let isUnlocked=false; let chart=null;
+
+    function setLockedState(locked){
+      isUnlocked=!locked;
+      form.classList.toggle('locked',locked);
+      form.querySelectorAll('input[data-editable="true"]').forEach(i=>i.disabled=locked);
+      saveBtn.disabled=locked;
+      el('unlock').disabled=!locked?true:false;
+      el('lock').disabled=locked;
+      el('lock-status').textContent=locked?'Bloccato: sola lettura':'Sbloccato: puoi modificare e salvare';
+      kpiEdit.textContent=locked?'NO':'SÌ';
+      kpiEdit.style.color=locked?'#c1121f':'#1f8a43';
+    }
+    setLockedState(true);
+
+    document.getElementById('togglePw').addEventListener('change',e=>{
+      document.getElementById('edit-password').type=e.target.checked?'text':'password';
+    });
+    document.getElementById('unlock').addEventListener('click',()=>{
+      const pwd=document.getElementById('edit-password').value.trim();
+      if(pwd===EDIT_PASSWORD){setLockedState(false)}else{document.getElementById('lock-status').textContent='Password errata'}
+    });
+    document.getElementById('lock').addEventListener('click',()=>setLockedState(true));
+
+    function buildFilters(){
+      const anno=parseInt(document.getElementById('anno').value,10);
+      const meseRaw=document.getElementById('mese').value;
+      const mese=meseRaw===''?null:parseInt(meseRaw,10);
+      return{anno,mese};
+    }
+
+    document.getElementById('load').addEventListener('click',loadRow);
+    async function loadRow(){
+      const {anno,mese}=buildFilters();
+      let query=supabase.from('indicatori_infortuni').select('*').eq('anno',anno).limit(1);
+      if(mese===null)query=query.is('mese',null);else query=query.eq('mese',mese);
+      const {data,error}=await query.maybeSingle();
+      if(error){document.getElementById('status').textContent='Errore caricamento: '+error.message;return;}
+      if(!data){document.getElementById('status').textContent='Nessun dato trovato per il filtro selezionato.';return;}
+      document.getElementById('data_ultimo_infortunio').value = data.data_ultimo_infortunio ? String(data.data_ultimo_infortunio).split('T')[0] : '';
+      document.getElementById('numero_infortuni').value=data.numero_infortuni??0;
+      document.getElementById('giorni_persi_infortunio').value=data.giorni_persi_infortunio??0;
+      document.getElementById('segnalazioni_mese').value=data.segnalazioni_mese??0;
+      document.getElementById('segnalazioni_totali_anno').value=data.segnalazioni_totali_anno??0;
+      document.getElementById('percentuale_chiusura_anno').value=data.percentuale_chiusura_anno??0;
+      document.getElementById('status').textContent='Dati caricati.';
+    }
+
+    form.addEventListener('submit',saveRow);
+    async function saveRow(ev){
+      ev.preventDefault();
+      if(!isUnlocked){document.getElementById('status').textContent='Inserisci la password per salvare.';return;}
+      const {anno,mese}=buildFilters();
+      const payload={
+        anno,mese,
+        data_ultimo_infortunio: document.getElementById('data_ultimo_infortunio').value || null,
+        numero_infortuni:parseInt(document.getElementById('numero_infortuni').value||'0',10),
+        giorni_persi_infortunio:parseInt(document.getElementById('giorni_persi_infortunio').value||'0',10),
+        segnalazioni_mese:parseInt(document.getElementById('segnalazioni_mese').value||'0',10),
+        segnalazioni_totali_anno:parseInt(document.getElementById('segnalazioni_totali_anno').value||'0',10),
+        percentuale_chiusura_anno:parseFloat(document.getElementById('percentuale_chiusura_anno').value||'0')
+      };
+      let del=supabase.from('indicatori_infortuni').delete().eq('anno',anno);
+      if(mese===null)del=del.is('mese',null);else del=del.eq('mese',mese);
+      const {error:delErr}=await del; if(delErr){document.getElementById('status').textContent='Errore cancellazione: '+delErr.message;return;}
+      const {error:insErr}=await supabase.from('indicatori_infortuni').insert(payload);
+      if(insErr){document.getElementById('status').textContent='Errore inserimento: '+insErr.message}
+      else {document.getElementById('status').textContent='Salvato correttamente ✔';loadTrend();}
+    }
+
+    async function loadTrend(){
+      const end=new Date(); end.setDate(1);
+      const months=[]; for(let i=11;i>=0;i--){const d=new Date(end);d.setMonth(d.getMonth()-i);months.push({y:d.getFullYear(),m:d.getMonth()+1,label:`${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`})}
+      const years=[...new Set(months.map(x=>x.y))];
+      const {data,error}=await supabase.from('indicatori_infortuni').select('*').in('anno',years).not('mese','is',null);
+      if(error){return;}
+      const byKey=new Map(data.map(r=>[`${r.anno}-${r.mese}`,r]));
+      const metric=document.getElementById('metric').value;
+      const labels=months.map(x=>x.label);
+      const values=months.map(x=>{const row=byKey.get(`${x.y}-${x.m}`); const v=row?row[metric]:0; return typeof v==='number'?v:parseFloat(v)||0;});
+      const type=document.getElementById('chartType').value;
+      if(chart){chart.destroy();}
+      const ctx=document.getElementById('trendChart').getContext('2d');
+      chart=new Chart(ctx,{type, data:{labels, datasets:[{label:metric, data:values}]} , options:{responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}}}});
+    }
+    document.getElementById('metric').addEventListener('change',loadTrend);
+    document.getElementById('chartType').addEventListener('change',loadTrend);
+    loadTrend();
+  </script>
+</body>
+</html>
