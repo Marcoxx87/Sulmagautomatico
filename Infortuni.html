@@ -90,23 +90,16 @@
               <label>Anno <input type="number" id="anno" value="2025" min="2000" max="2100" /></label>
               <label>Mese (1–12, vuoto = annuale) <input type="number" id="mese" min="1" max="12" /></label>
             </div>
-
-            <div class="row two">
-              <label>Data ultimo infortunio
-                <input type="date" id="data_ultimo_infortunio" data-editable="true"/>
-              </label>
-            </div>
-
             <div class="row three">
               <label>Numero infortuni <input type="number" id="numero_infortuni" min="0" value="0" data-editable="true"/></label>
+              <label>Giorni senza infortunio <input type="number" id="giorni_senza_infortunio" min="0" value="0" data-editable="true"/></label>
               <label>Giorni persi per infortunio <input type="number" id="giorni_persi_infortunio" min="0" value="0" data-editable="true"/></label>
-              <label>Segnalazioni del mese <input type="number" id="segnalazioni_mese" min="0" value="0" data-editable="true"/></label>
             </div>
             <div class="row three">
+              <label>Segnalazioni del mese <input type="number" id="segnalazioni_mese" min="0" value="0" data-editable="true"/></label>
               <label>Tot segnalazioni anno <input type="number" id="segnalazioni_totali_anno" min="0" value="0" data-editable="true"/></label>
               <label>% chiusura segnalazioni anno <input type="number" id="percentuale_chiusura_anno" min="0" max="100" step="0.01" value="0" data-editable="true"/></label>
             </div>
-
             <div class="row two">
               <button class="btn btn-outline" type="button" id="load">Carica</button>
               <button class="btn btn-primary" type="submit" id="save" disabled>Salva</button>
@@ -123,6 +116,7 @@
                 <option value="numero_infortuni">Numero infortuni</option>
                 <option value="segnalazioni_mese">Segnalazioni del mese</option>
                 <option value="giorni_persi_infortunio">Giorni persi per infortunio</option>
+                <option value="giorni_senza_infortunio">Giorni senza infortunio</option>
                 <option value="segnalazioni_totali_anno">Tot segnalazioni anno</option>
                 <option value="percentuale_chiusura_anno">% chiusura segnalazioni</option>
               </select>
@@ -143,11 +137,11 @@
   <script>
     const supabaseUrl='https://orttbxpxuohxfsqwrzcy.supabase.co';
     const supabaseKey='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs';
-    const supabase=window.supabase.createClient(supabaseUrl,supabaseKey);
+    const sb=window.supabase.createClient(supabaseUrl,supabaseKey);
     const EDIT_PASSWORD='Debora';
     const el=id=>document.getElementById(id);
     const form=el('metrics-form'); const saveBtn=el('save'); const kpiEdit=el('kpi-edit');
-    let isUnlocked=false; let chart=null;
+    let isUnlocked=false; let chart=null;   /* 👈 rimane UNA sola dichiarazione */
 
     function setLockedState(locked){
       isUnlocked=!locked;
@@ -181,13 +175,13 @@
     document.getElementById('load').addEventListener('click',loadRow);
     async function loadRow(){
       const {anno,mese}=buildFilters();
-      let query=supabase.from('indicatori_infortuni').select('*').eq('anno',anno).limit(1);
+      let query=sb.from('indicatori_infortuni').select('*').eq('anno',anno).limit(1);
       if(mese===null)query=query.is('mese',null);else query=query.eq('mese',mese);
       const {data,error}=await query.maybeSingle();
       if(error){document.getElementById('status').textContent='Errore caricamento: '+error.message;return;}
       if(!data){document.getElementById('status').textContent='Nessun dato trovato per il filtro selezionato.';return;}
-      document.getElementById('data_ultimo_infortunio').value = data.data_ultimo_infortunio ? String(data.data_ultimo_infortunio).split('T')[0] : '';
       document.getElementById('numero_infortuni').value=data.numero_infortuni??0;
+      document.getElementById('giorni_senza_infortunio').value=data.giorni_senza_infortunio??0;
       document.getElementById('giorni_persi_infortunio').value=data.giorni_persi_infortunio??0;
       document.getElementById('segnalazioni_mese').value=data.segnalazioni_mese??0;
       document.getElementById('segnalazioni_totali_anno').value=data.segnalazioni_totali_anno??0;
@@ -202,17 +196,17 @@
       const {anno,mese}=buildFilters();
       const payload={
         anno,mese,
-        data_ultimo_infortunio: document.getElementById('data_ultimo_infortunio').value || null,
         numero_infortuni:parseInt(document.getElementById('numero_infortuni').value||'0',10),
+        giorni_senza_infortunio:parseInt(document.getElementById('giorni_senza_infortunio').value||'0',10),
         giorni_persi_infortunio:parseInt(document.getElementById('giorni_persi_infortunio').value||'0',10),
         segnalazioni_mese:parseInt(document.getElementById('segnalazioni_mese').value||'0',10),
         segnalazioni_totali_anno:parseInt(document.getElementById('segnalazioni_totali_anno').value||'0',10),
         percentuale_chiusura_anno:parseFloat(document.getElementById('percentuale_chiusura_anno').value||'0')
       };
-      let del=supabase.from('indicatori_infortuni').delete().eq('anno',anno);
+      let del=sb.from('indicatori_infortuni').delete().eq('anno',anno);
       if(mese===null)del=del.is('mese',null);else del=del.eq('mese',mese);
       const {error:delErr}=await del; if(delErr){document.getElementById('status').textContent='Errore cancellazione: '+delErr.message;return;}
-      const {error:insErr}=await supabase.from('indicatori_infortuni').insert(payload);
+      const {error:insErr}=await sb.from('indicatori_infortuni').insert(payload);
       if(insErr){document.getElementById('status').textContent='Errore inserimento: '+insErr.message}
       else {document.getElementById('status').textContent='Salvato correttamente ✔';loadTrend();}
     }
@@ -221,7 +215,7 @@
       const end=new Date(); end.setDate(1);
       const months=[]; for(let i=11;i>=0;i--){const d=new Date(end);d.setMonth(d.getMonth()-i);months.push({y:d.getFullYear(),m:d.getMonth()+1,label:`${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`})}
       const years=[...new Set(months.map(x=>x.y))];
-      const {data,error}=await supabase.from('indicatori_infortuni').select('*').in('anno',years).not('mese','is',null);
+      const {data,error}=await sb.from('indicatori_infortuni').select('*').in('anno',years).not('mese','is',null);
       if(error){return;}
       const byKey=new Map(data.map(r=>[`${r.anno}-${r.mese}`,r]));
       const metric=document.getElementById('metric').value;
