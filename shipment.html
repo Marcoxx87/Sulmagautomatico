@@ -123,7 +123,7 @@ require_once __DIR__ . '/auth.php';
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
-    const supabase = window.supabase.createClient(
+    const sb = window.supabase.createClient(
       'https://orttbxpxuohxfsqwrzcy.supabase.co',
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
     );
@@ -140,7 +140,7 @@ require_once __DIR__ . '/auth.php';
       document.getElementById('table-body').innerHTML = '';
 
      
-      let { data: inventory, error: invError } = await supabase
+      let { data: inventory, error: invError } = await sb
         .from('inventory_stockunit')
         .select('LPN');
 
@@ -152,7 +152,7 @@ require_once __DIR__ . '/auth.php';
       lpnInventorySet = new Set((inventory || []).map(row => String(row.LPN)));
 
       
-      let { data, error } = await supabase
+      let { data, error } = await sb
         .from('shipment_pallets')
         .select('*')
         .order('StagingAreaName', { ascending: true })

@@ -220,7 +220,7 @@ require_once __DIR__ . '/auth.php';
   <script>
     const supabaseUrl = 'https://orttbxpxuohxfsqwrzcy.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const sb = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     let currentData = [];
     let lastDataKeys = [];
@@ -239,7 +239,7 @@ require_once __DIR__ . '/auth.php';
       document.getElementById('data-table').style.display = 'none';
       document.getElementById('table-body').innerHTML = '';
 
-      let { data, error } = await supabase
+      let { data, error } = await sb
         .from('fermi_act')
         .select('*')
         .order('Fonte', { ascending: true })
