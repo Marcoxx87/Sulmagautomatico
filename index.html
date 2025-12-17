@@ -1,12 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>TV Dashboard – KPI + Rotazione</title>
-  <link rel="icon" href="refresco_logo.jpg" type="image/jpg">
+
+  <!-- GitHub Pages / path robusto -->
+  <link rel="icon" href="./refresco_logo.jpg" type="image/jpeg" />
+
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+
   <style>
     :root{--brand:#f6921e;--brand-dark:#d67500;--brand-green:#43a047;--ok:#2e7d32;--warn:#f9a825;--danger:#d32f2f;--ink:#1b2440;--muted:#5a6a85;--ring:#f6921e;--ring-rest:#eef2f7;--header-h:5mm}
     *{box-sizing:border-box}
@@ -66,19 +69,21 @@
     .q-note{font-size:14px;font-weight:400;opacity:.95}
     .bottom-panels .card{padding:10px}
     .brand-clock{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;height:110px;padding:0;border:2px solid var(--brand-green)}
-    .brand-clock::before{content:"";position:absolute;inset:0;background:url('refresco_logo.jpg') center/cover no-repeat;opacity:.18;filter:saturate(1.1)}
+    .brand-clock::before{content:"";position:absolute;inset:0;background:url('./refresco_logo.jpg') center/cover no-repeat;opacity:.18;filter:saturate(1.1)}
     .brand-clock .clock-wrap{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;text-align:center}
     .brand-clock .clock-title{font-weight:900;color:var(--muted);margin-bottom:4px}
     .brand-clock .big-clock{font-size:52px;line-height:1;font-weight:900;color:var(--ink)}
     .brand-clock .date{margin-top:4px;font-weight:800;color:var(--muted)}
   </style>
 </head>
+
 <body>
   <header>
-    <div class="hidden"><img src="refresco_logo.jpg" alt="Refresco" height="1"></div>
+    <div class="hidden"><img src="./refresco_logo.jpg" alt="Refresco" height="1"></div>
     <div class="hidden title">TV DASHBOARD • KPI & OEE • LIVE</div>
     <div class="hidden clock" id="clock">--:--:--</div>
   </header>
+
   <div class="layout">
     <div class="col">
       <div class="card brand-clock">
@@ -88,16 +93,32 @@
           <div class="date" id="big-date">— ———— ————</div>
         </div>
       </div>
+
       <div class="card kpi"><div class="label">Fermi attivi</div><div class="value" id="kpi-fermi">—</div></div>
-      <div class="card kpi" style="display:none"><div class="label">Carwash</div><div id="kpi-cw-status" class="status ok">OK</div></div>
+
       <div class="card kpi">
         <div class="label">Spedizioni attive</div><div class="value" id="kpi-sped">—</div>
         <div class="label" id="kpi-sped-mini" style="grid-column:1/-1">Media avanzamento: —</div>
         <div class="label" id="kpi-ot-mini" style="grid-column:1/-1">Pallet in uscita per spedizioni: —</div>
       </div>
-      <div class="card gcard"><div class="gtitle">Occupazione Baie</div><div class="gwrap"><div class="gauge" id="gauge-baie"><div class="glabel" id="gauge-baie-txt">—%</div></div><div class="gmeta" id="gauge-baie-meta">—/17</div></div></div>
-      <div class="card gcard"><div class="gtitle">Locazioni bloccate</div><div class="gwrap"><div class="gauge" id="gauge-loc"><div class="glabel" id="gauge-loc-txt">—%</div></div><div class="gmeta" id="gauge-loc-meta">—/12884</div></div></div>
+
+      <div class="card gcard">
+        <div class="gtitle">Occupazione Baie</div>
+        <div class="gwrap">
+          <div class="gauge" id="gauge-baie"><div class="glabel" id="gauge-baie-txt">—%</div></div>
+          <div class="gmeta" id="gauge-baie-meta">—/17</div>
+        </div>
+      </div>
+
+      <div class="card gcard">
+        <div class="gtitle">Locazioni bloccate</div>
+        <div class="gwrap">
+          <div class="gauge" id="gauge-loc"><div class="glabel" id="gauge-loc-txt">—%</div></div>
+          <div class="gmeta" id="gauge-loc-meta">—/12884</div>
+        </div>
+      </div>
     </div>
+
     <div class="center">
       <div class="bar card"><div class="label-url" id="url-label">—</div></div>
       <div class="viewer">
@@ -105,22 +126,46 @@
         <div class="alert" id="cw-alert"><div class="txt blink">CARWASH PIENO</div></div>
       </div>
     </div>
+
     <div class="col">
       <div class="card kpi">
         <div class="label">Pallet in Carwash (oggi)</div>
         <div class="value" id="kpi-cw">—</div>
         <div class="small-list" id="kpi-cw-mini">—</div>
       </div>
-      <div class="card gcard"><div class="gtitle">Saturazione Magazzino</div><div class="gwrap"><div class="gauge" id="gauge-sat"><div class="glabel" id="gauge-sat-txt">—%</div></div><div class="gmeta" id="gauge-sat-meta">—/31540</div></div></div>
+
+      <div class="card gcard">
+        <div class="gtitle">Saturazione Magazzino</div>
+        <div class="gwrap">
+          <div class="gauge" id="gauge-sat"><div class="glabel" id="gauge-sat-txt">—%</div></div>
+          <div class="gmeta" id="gauge-sat-meta">—/31540</div>
+        </div>
+      </div>
+
       <div class="card kpi" id="gest-card">
         <div class="label">Pallet da Gestire</div>
         <div class="value" id="gest-tot">—</div>
         <div class="small-list" id="gest-mini" style="grid-column:1/-1">—</div>
       </div>
-      <div class="card"><div class="meteo-title">Meteo • Sulmona</div><div class="meteo"><div class="temp" id="meteo-temp">—°C</div><div><div class="desc" id="meteo-desc">—</div><div class="desc" id="meteo-wind">—</div></div></div></div>
-      <div class="card"><div class="meteo-title">Ultime notizie</div><div class="ticker" id="news-ticker">—</div></div>
+
+      <div class="card">
+        <div class="meteo-title">Meteo • Sulmona</div>
+        <div class="meteo">
+          <div class="temp" id="meteo-temp">—°C</div>
+          <div>
+            <div class="desc" id="meteo-desc">—</div>
+            <div class="desc" id="meteo-wind">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="meteo-title">Ultime notizie</div>
+        <div class="ticker" id="news-ticker">—</div>
+      </div>
     </div>
   </div>
+
   <div class="bottom-panels">
     <div class="card" id="safety-card">
       <div class="safety-title">Sicurezza</div>
@@ -132,284 +177,280 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const $=id=>document.getElementById(id);
-    const supabase=window.supabase.createClient('https://orttbxpxuohxfsqwrzcy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs');
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 
-    function updateTime(){
-      const now=new Date();
-      const hh=now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-      const dd=now.toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
-      const b=$('big-clock');if(b)b.textContent=hh;
-      const bd=$('big-date');if(bd)bd.textContent=dd;
-      const h=$('clock');if(h)h.textContent=hh;
-    }
-    setInterval(updateTime,1000);updateTime();
+  <script defer>
+    window.addEventListener('DOMContentLoaded', () => {
+      const $ = (id) => document.getElementById(id);
 
-    function cls(v,w,d){if(v>=d)return'danger';if(v>=w)return'warn';return'ok'}
-    function setKpi(id,val,c){const el=$(id);if(!el)return;el.textContent=val;if(c)el.className='value '+c}
-    function gaugeColor(p,better='high',th={good:70,warn:90}){if(better==='low'){if(p<=th.good)return'var(--ok)';if(p<=th.warn)return'var(--warn)';return'var(--danger)'}if(p>=th.good)return'var(--ok)';if(p>=th.warn)return'var(--warn)';return'var(--danger)'}
-    function setGauge(baseId,percent,metaText,better='high',th={good:70,warn:90}){const ring=$(baseId),txt=$(baseId+'-txt'),meta=$(baseId+'-meta');if(!ring||!txt)return;const p=Math.max(0,Math.min(100,Math.round(percent)));const col=gaugeColor(p,better,th);ring.style.background=`conic-gradient(${col} ${p}%, var(--ring-rest) 0)`;txt.textContent=p+'%';if(meta)meta.textContent=metaText||''}
+      // Evita "Identifier 'supabase' has already been declared"
+      // e impedisce doppie inizializzazioni se la pagina viene inclusa due volte
+      const sb = window.__sbClient ?? (window.__sbClient =
+        window.supabase.createClient(
+          'https://orttbxpxuohxfsqwrzcy.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9ydHRieHB4dW9oeGZzcXdyemN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NDAxMTksImV4cCI6MjA2NjQxNjExOX0.Lxe0r28sb4-JYRasIJJU13uq8sfiGSeNTeuWC98_wCs'
+        )
+      );
 
-    async function loadKpi(){
-      try{
+      function updateTime(){
         const now=new Date();
-        const start=new Date(now); start.setHours(0,0,0,0);
-
-        const ferm=await supabase.from('fermi_act').select('*',{count:'exact'});
-        const f=ferm.count||0;
-        setKpi('kpi-fermi',f,cls(f,1,3));
-
-        const cwFull=(ferm.data||[]).some(r=>/segment\s*:\s*969\s*;\s*point\s*755/i.test(String(r.AlarmDetails||'')));
-        const resiFull=(ferm.data||[]).some(r=>/segment\s*:\s*2526\s*;\s*point\s*1629/i.test(String(r.AlarmDetails||'')));
-
-        const cwStatus=$('kpi-cw-status');
-        if(cwStatus){
-          let statusTxt='OK';
-          let statusClass='ok';
-          if(cwFull && resiFull){ statusTxt='CARWASH + RESI UP PIENI'; statusClass='danger'; }
-          else if(cwFull){ statusTxt='CARWASH PIENO'; statusClass='danger'; }
-          else if(resiFull){ statusTxt='RESI UP PIENO'; statusClass='danger'; }
-          cwStatus.textContent=statusTxt;
-          cwStatus.className='status '+statusClass;
-        }
-
-        const alertEl=$('cw-alert');
-        if(alertEl){
-          const msg=(cwFull && resiFull) ? 'CARWASH E RESI UP PIENI'
-                 : cwFull ? 'CARWASH PIENO'
-                 : resiFull ? 'RESI UP PIENO'
-                 : '';
-          alertEl.querySelector('.txt').textContent=msg||'';
-          alertEl.classList.toggle('show', !!msg);
-        }
-
-        const sp=await supabase.from('shipment_pallets').select('*');
-        const done=['Completato','Completed','Closed','Fatto','Finito'].map(x=>x.toLowerCase());
-        const by={};
-        (sp.data||[]).forEach(r=>{
-          const k=r.ShipmentNumber;
-          if(!by[k])by[k]={prev:0,cons:0,status:(r.ShipmentStatusDescription||''),raw:[]};
-          by[k].prev=r.PalletPrevisti||by[k].prev;
-          by[k].cons=r.PalletConsegnati||by[k].cons;
-          if(r.ShipmentStatusDescription)by[k].status=r.ShipmentStatusDescription;
-          by[k].raw.push(r);
-        });
-        const rows=Object.values(by);
-        const att=rows.filter(s=>!done.includes(String(s.status||'').toLowerCase()));
-        const media=att.length?Math.round(att.reduce((a,b)=>a+(b.prev?(b.cons/b.prev)*100:0),0)/att.length):0;
-        setKpi('kpi-sped',att.length,cls(att.length,3,8));
-        $('kpi-sped-mini').textContent=`Media avanzamento: ${media}%`;
-
-        const attesa=await supabase.from('shipment_attesa').select('*');
-        $('kpi-ot-mini').textContent=`Pallet in uscita per spedizioni: ${(attesa.data||[]).length}`;
-
-        const bays=new Set();
-        att.forEach(s=>s.raw.forEach(r=>{const v=(r.StagingAreaName||'').toString().trim();if(v)bays.add(v)}));
-        setGauge('gauge-baie',Math.min(100,Math.round((bays.size/17)*100)),`${bays.size}/17`,'low',{good:50,warn:80});
-
-        const cwAll=await supabase.from('pallet_storico_new').select('StorageLocation,EnterDateTime,Partenza').order('EnterDateTime',{ascending:false});
-        const list=(cwAll.data||[])
-          .filter(r=>{
-            const t=new Date(r.EnterDateTime);
-            return !isNaN(t) && t>=start && t<=now;
-          })
-          .map(r=>({
-            loc:String(r.StorageLocation||'').toUpperCase(),
-            src:(r.Partenza??r.partenza??'').toString().trim()||'—'
-          }));
-        const cwMain=list.filter(x=>x.loc==='CW');
-        const cwDown=list.filter(x=>x.loc==='CW_DOWN');
-        const wanted=[
-          {key:'PICK_CO_PACK',label:'CO_PACK'},
-          {key:'PICK_LINEA_84',label:'Linea 84'},
-          {key:'PICK_LINEA_83',label:'Linea 83'},
-          {key:'PICK_LINEA_82',label:'Linea 82'},
-          {key:'PICK_LINEA_81',label:'Linea 81'}
-        ];
-        const srcMap={}; cwMain.forEach(x=>{srcMap[x.src]=(srcMap[x.src]||0)+1});
-        const sel=wanted.map(w=>({label:w.label,val:(srcMap[w.key]||0)}));
-        const selSum=sel.reduce((a,b)=>a+b.val,0);
-        const other=Math.max(0,cwMain.length-selSum);
-        const cwMainCnt=cwMain.length, cwDownCnt=cwDown.length, tot=cwMainCnt+cwDownCnt;
-        setKpi('kpi-cw',tot,cls(tot,20,60));
-        $('kpi-cw-mini').innerHTML=[
-          `<b>CW: ${cwMainCnt}</b>`,
-          ...sel.filter(s=>s.val>0).map(s=>`<span class="kv">${s.label}: ${s.val}</span>`),
-          other>0?`<span class="kv">Altro: ${other}</span>`:'',
-          `<br><b>DOWN: ${cwDownCnt}</b>`
-        ].filter(Boolean).join(' ');
-
-        const totP=await supabase.from('totale_articoli').select('NumPallet');
-        const pallets=(totP.data||[]).reduce((s,r)=>s+Number(r.NumPallet||0),0);
-        const cap=31540;
-        const sat=cap?Math.round((pallets/cap)*100):0;
-        setGauge('gauge-sat',sat,`${pallets}/${cap}`,'low',{good:50,warn:80});
-
-        const loc=await supabase.from('magazzino_stato').select('PRELIEVO_DISABILITATO,DEPOSITO_DISABILITATO,LOCAZIONE');
-        const bloc=(loc.data||[]).filter(r=>r.PRELIEVO_DISABILITATO||r.DEPOSITO_DISABILITATO);
-        const totalDisp=12884;
-        const percBloc=totalDisp?Math.round((bloc.length/totalDisp)*100):0;
-        setGauge('gauge-loc',percBloc,`${bloc.length}/${totalDisp}`,'low',{good:2,warn:5});
-      }catch(e){console.error(e)}
-    }
-
-    async function loadPalletDaGestire(){
-      try{
-        let spezz=0;
-        const tables=['spezzature_magazzino','spezzature','t_spezzature','spezzature_totali'];
-        for(const t of tables){
-          const r=await supabase.from(t).select('*',{count:'exact'}).limit(1);
-          if(!r.error && typeof r.count==='number'){spezz=r.count;break}
-        }
-
-        let scaduti=0;
-        { const r=await supabase.from('Pallet_Scaduti').select('*',{count:'exact'}).limit(1);
-          if(!r.error && typeof r.count==='number') scaduti=r.count; }
-
-        let shelfFM=0;
-        { const r=await supabase
-            .from('pallet_shelf_life')
-            .select('*',{count:'exact'})
-            .or('DescrizioneFamiglia.ilike.%finito%,DescrizioneFamiglia.ilike.%mix%')
-            .limit(1);
-          if(!r.error && typeof r.count==='number') shelfFM=r.count; }
-
-        const tot = spezz + scaduti + shelfFM;
-        $('gest-tot').textContent = tot;
-        $('gest-tot').className = 'value ' + (tot>=100 ? 'danger' : (tot>=40 ? 'warn' : 'ok'));
-        $('gest-mini').innerHTML = [
-          `<span class="kv"><b>Spezzature:</b> ${spezz}</span>`,
-          `<span class="kv"><b>Scaduti:</b> ${scaduti}</span>`,
-          `<span class="kv"><b>ShelfLife finito/mix:</b> ${shelfFM}</span>`
-        ].join(' ');
-      }catch(e){
-        $('gest-tot').textContent='—';
-        $('gest-mini').textContent='—';
-        console.error(e);
+        const hh=now.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+        const dd=now.toLocaleDateString('it-IT',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});
+        const b=$('big-clock'); if(b) b.textContent=hh;
+        const bd=$('big-date'); if(bd) bd.textContent=dd;
+        const h=$('clock'); if(h) h.textContent=hh;
       }
-    }
+      setInterval(updateTime,1000); updateTime();
 
-    async function loadSafety(){
-      const y=new Date().getFullYear();
-      try{
-        const r=await supabase.from('indicatori_infortuni').select('numero_infortuni,giorni_persi_infortunio,segnalazioni_mese,segnalazioni_totali_anno,percentuale_chiusura_anno,data_ultimo_infortunio,anno,mese').eq('anno',y).order('mese',{ascending:false}).limit(1);
-        const d=(r.data||[])[0]||{};
-        const fmt=v=>v==null?'—':String(v);
-        const pct=(d.percentuale_chiusura_anno!=null)?`${Number(d.percentuale_chiusura_anno).toFixed(0)}%`:'—';
-        let giorniSenza='—';
-        if(d.data_ultimo_infortunio){
-          const last=new Date(String(d.data_ultimo_infortunio).split('T')[0]);
-          const today=new Date(); today.setHours(0,0,0,0);
-          const diffMs=today-last; if(!isNaN(diffMs))giorniSenza=Math.max(0,Math.floor(diffMs/(1000*60*60*24)));
+      function cls(v,w,d){ if(v>=d) return 'danger'; if(v>=w) return 'warn'; return 'ok'; }
+      function setKpi(id,val,c){ const el=$(id); if(!el) return; el.textContent=val; if(c) el.className='value '+c; }
+      function gaugeColor(p,better='high',th={good:70,warn:90}){
+        if(better==='low'){
+          if(p<=th.good) return 'var(--ok)';
+          if(p<=th.warn) return 'var(--warn)';
+          return 'var(--danger)';
         }
-        const left=[{lab:`Numero infortuni ${y}`,val:fmt(d.numero_infortuni)},{lab:'Giorni senza infortunio',val:fmt(giorniSenza)},{lab:'Giorni persi per infortunio',val:fmt(d.giorni_persi_infortunio)}];
-        const right=[{lab:'Segnalazioni del mese',val:fmt(d.segnalazioni_mese)},{lab:'Tot segnalazioni anno',val:fmt(d.segnalazioni_totali_anno)},{lab:'% chiusura segnalazioni anno',val:pct}];
-        const pill=x=>`<div class="s-pill"><div class="lab">${x.lab}</div><div class="val">${x.val}</div></div>`;
-        $('safety-row').innerHTML=`<div class="safety-col">${left.map(pill).join('')}</div><div class="safety-col">${right.map(pill).join('')}</div>`;
-      }catch(e){console.error(e)}
-    }
-
-    async function loadQuality(){
-      try{
-        const r=await supabase.from('segnalazioni_qualita').select('*').order('creato_il',{ascending:false}).limit(1);
-        const d=(r.data||[])[0]||{};
-        const fmtDate=v=>v?new Date(String(v).split('T')[0]).toLocaleDateString('it-IT'):'—';
-        const fmtTxt=v=>v&&String(v).trim()?String(v).trim():'—';
-        const lines=[
-          {line:81,date:d.data_sanificazione_81,note:d.segnalazione_81},
-          {line:82,date:d.data_sanificazione_82,note:d.segnalazione_82},
-          {line:83,date:d.data_sanificazione_83,note:d.segnalazione_83},
-          {line:84,date:d.data_sanificazione_84,note:d.segnalazione_84}
-        ];
-        $('quality-row').innerHTML=lines.map(x=>`<div class="quality-item" title="${fmtTxt(x.note)}"><div class="q-lab">Linea ${x.line}</div><div class="q-val"><span class="q-pre">Sanificata il</span><span class="q-date">${fmtDate(x.date)}</span><span class="q-sep">—</span><span class="q-pre" style="font-weight:400">Ultima segnalazione:</span><span class="q-note">${fmtTxt(x.note)}</span></div></div>`).join('');
-      }catch(e){console.error(e)}
-    }
-
-    loadKpi(); setInterval(loadKpi,30000);
-    loadPalletDaGestire(); setInterval(loadPalletDaGestire,60000);
-    loadSafety(); setInterval(loadSafety,300000);
-    loadQuality(); setInterval(loadQuality,300000);
-  </script>
-
-  <script>
-    async function loadMeteo(){
-      try{
-        const res=await fetch('https://api.open-meteo.com/v1/forecast?latitude=42.05&longitude=13.93&current=temperature_2m,weather_code,wind_speed_10m',{cache:'no-store'});
-        const j=await res.json(); const c=j.current||{};
-        const wmap={0:'Sereno ☀️',1:'Poco nuvoloso 🌤️',2:'Variabile ⛅',3:'Nuvoloso ☁️',45:'Nebbia 🌫️',48:'Nebbia 🌫️',51:'Pioviggine 🌦️',53:'Pioviggine 🌦️',55:'Pioviggine 🌦️',61:'Pioggia 🌧️',63:'Pioggia 🌧️',65:'Pioggia 🌧️',71:'Neve ❄️',73:'Neve ❄️',75:'Neve ❄️',80:'Rovesci 🌧️',81:'Rovesci 🌧️',82:'Rovesci 🌧️',95:'Temporali ⛈️',96:'Temporali ⛈️',99:'Temporali ⛈️'};
-        document.getElementById('meteo-temp').textContent=(c.temperature_2m!=null?Math.round(c.temperature_2m):'—')+'°C';
-        document.getElementById('meteo-desc').textContent=wmap[c.weather_code]||'—';
-        document.getElementById('meteo-wind').textContent='Vento: '+(c.wind_speed_10m!=null?Math.round(c.wind_speed_10m)+' km/h':'—');
-      }catch(e){
-        document.getElementById('meteo-temp').textContent='—°C';
-        document.getElementById('meteo-desc').textContent='—';
-        document.getElementById('meteo-wind').textContent='—';
+        if(p>=th.good) return 'var(--ok)';
+        if(p>=th.warn) return 'var(--warn)';
+        return 'var(--danger)';
       }
-    }
-    loadMeteo(); setInterval(loadMeteo,600000);
-
-    let newsItems=[],newsIdx=0;
-    function cleanText(s){return(s||'').replace(/<[^>]*>/g,' ').replace(/&[^;]+;/g,' ').replace(/\s+/g,' ').trim()}
-    function parseXmlItems(txt){
-      try{
-        const xml=new DOMParser().parseFromString(txt,'text/xml');
-        const items=[...xml.querySelectorAll('item')].map(it=>({t:cleanText(it.querySelector('title')?.textContent),l:cleanText(it.querySelector('link')?.textContent)})).filter(i=>i.t&&i.l);
-        if(items.length)return items;
-      }catch(e){}
-      const blocks=[...txt.matchAll(/<item[\s\S]*?<\/item>/gi)].map(m=>m[0]);
-      return blocks.map(b=>{
-        const t=(b.match(/<title>([\s\S]*?)<\/title>/i)||[])[1]||'';
-        const l=(b.match(/<link>(https?:[\s\S]*?)<\/link>/i)||[])[1]||'#';
-        return{t:cleanText(t),l:cleanText(l)}
-      }).filter(i=>i.t&&/^https?:\/\//.test(i.l))
-    }
-    function filterNews(arr){const bad=/cookie|consenso|privacy|informativa/i;return arr.filter(i=>!bad.test(i.t))}
-    async function fetchViaAllOrigins(u){const r=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(u),{cache:'no-store'});if(!r.ok)throw new Error('origins');return await r.text()}
-    async function fetchViaJina(u){const r=await fetch('https://r.jina.ai/'+u,{cache:'no-store'});if(!r.ok)throw new Error('jina');return await r.text()}
-    async function fetchViaRss2Json(u){const r=await fetch('https://api.rss2json.com/v1/api.json?count=25&rss_url='+encodeURIComponent(u),{cache:'no-store'});if(!r.ok)throw new Error('rss2json');const j=await r.json();if(!j.items?.length)throw new Error('empty');return j.items.map(it=>({t:cleanText(it.title),l:it.link}))}
-    async function loadFromSource(src){
-      try{const txt=await fetchViaAllOrigins(src);const items=parseXmlItems(txt);if(items.length)return filterNews(items)}catch(e){}
-      try{const txt=await fetchViaJina(src);const items=parseXmlItems(txt);if(items.length)return filterNews(items)}catch(e){}
-      try{const items=await fetchViaRss2Json(src);if(items.length)return filterNews(items)}catch(e){}
-      return []
-    }
-    async function loadNews(){
-      const sources=['https://www.ansa.it/sito/ansait_rss.xml','https://www.ilsole24ore.com/rss/notizie.xml','https://www.repubblica.it/rss/homepage/rss2.0.xml','https://feeds.bbci.co.uk/news/world/rss.xml'];
-      for(const s of sources){
-        const items=await loadFromSource(s);
-        if(items.length){newsItems=items.slice(0,30);newsIdx=0;renderTicker();return}
+      function setGauge(baseId,percent,metaText,better='high',th={good:70,warn:90}){
+        const ring=$(baseId),txt=$(baseId+'-txt'),meta=$(baseId+'-meta');
+        if(!ring||!txt) return;
+        const p=Math.max(0,Math.min(100,Math.round(percent)));
+        const col=gaugeColor(p,better,th);
+        ring.style.background=`conic-gradient(${col} ${p}%, var(--ring-rest) 0)`;
+        txt.textContent=p+'%';
+        if(meta) meta.textContent=metaText||'';
       }
-      newsItems=[{t:'Notizie non disponibili',l:'#'}];renderTicker()
-    }
-    function renderTicker(){
-      const t=document.getElementById('news-ticker');
-      if(!t||!newsItems.length){t.textContent='—';return}
-      const it=newsItems[newsIdx%newsItems.length];
-      t.innerHTML=`<a href="${it.l}" target="_blank" rel="noopener">${it.t}</a>`;
-      newsIdx++
-    }
-    loadNews(); setInterval(renderTicker,8000); setInterval(loadNews,600000);
 
-    const PAGES=[
-      {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/PlantDashboard.aspx',label:'OEEblue – Plant Dashboard',popup:false},
-      {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=97',label:'OEEblue – LINEA 81',popup:false},
-      {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=100',label:'OEEblue – LINEA 82',popup:false},
-      {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=109',label:'OEEblue – LINEA 83',popup:false},
-      {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=106',label:'OEEblue – LINEA 84',popup:false},
-      {url:'Carwash.html',label:'Carwash',popup:false},
-      {url:'shipment.html',label:'Spedizioni',popup:false},
-      {url:'fermate.html',label:'Fermate',popup:false}
-    ];
-    const INTERVAL=30000;
-    const frame=document.getElementById('rotor'),urlL=document.getElementById('url-label');
-    let idx=0,timer=null;
-    function show(k){idx=(k+PAGES.length)%PAGES.length;const p=PAGES[idx];urlL.textContent=p.label||p.url;frame.src=p.url}
-    function next(){show(idx+1)}
-    function start(){if(timer)clearInterval(timer);timer=setInterval(next,INTERVAL)}
-    function init(){show(0);start()}
-    init();
+      async function loadKpi(){
+        try{
+          const now=new Date();
+          const start=new Date(now); start.setHours(0,0,0,0);
+
+          const ferm=await sb.from('fermi_act').select('*',{count:'exact'});
+          const f=ferm.count||0;
+          setKpi('kpi-fermi',f,cls(f,1,3));
+
+          const sp=await sb.from('shipment_pallets').select('*');
+          const done=['Completato','Completed','Closed','Fatto','Finito'].map(x=>x.toLowerCase());
+          const by={};
+          (sp.data||[]).forEach(r=>{
+            const k=r.ShipmentNumber;
+            if(!by[k])by[k]={prev:0,cons:0,status:(r.ShipmentStatusDescription||''),raw:[]};
+            by[k].prev=r.PalletPrevisti||by[k].prev;
+            by[k].cons=r.PalletConsegnati||by[k].cons;
+            if(r.ShipmentStatusDescription)by[k].status=r.ShipmentStatusDescription;
+            by[k].raw.push(r);
+          });
+          const rows=Object.values(by);
+          const att=rows.filter(s=>!done.includes(String(s.status||'').toLowerCase()));
+          const media=att.length?Math.round(att.reduce((a,b)=>a+(b.prev?(b.cons/b.prev)*100:0),0)/att.length):0;
+          setKpi('kpi-sped',att.length,cls(att.length,3,8));
+          $('kpi-sped-mini').textContent=`Media avanzamento: ${media}%`;
+
+          const attesa=await sb.from('shipment_attesa').select('*');
+          $('kpi-ot-mini').textContent=`Pallet in uscita per spedizioni: ${(attesa.data||[]).length}`;
+
+          const bays=new Set();
+          att.forEach(s=>s.raw.forEach(r=>{const v=(r.StagingAreaName||'').toString().trim();if(v)bays.add(v)}));
+          setGauge('gauge-baie',Math.min(100,Math.round((bays.size/17)*100)),`${bays.size}/17`,'low',{good:50,warn:80});
+
+          const cwAll=await sb.from('pallet_storico_new').select('StorageLocation,EnterDateTime,Partenza').order('EnterDateTime',{ascending:false});
+          const list=(cwAll.data||[])
+            .filter(r=>{
+              const t=new Date(r.EnterDateTime);
+              return !isNaN(t) && t>=start && t<=now;
+            })
+            .map(r=>({
+              loc:String(r.StorageLocation||'').toUpperCase(),
+              src:(r.Partenza??r.partenza??'').toString().trim()||'—'
+            }));
+
+          const cwMain=list.filter(x=>x.loc==='CW');
+          const cwDown=list.filter(x=>x.loc==='CW_DOWN');
+          const tot=cwMain.length+cwDown.length;
+          setKpi('kpi-cw',tot,cls(tot,20,60));
+          $('kpi-cw-mini').innerHTML = `<b>CW: ${cwMain.length}</b> <span class="kv">DOWN: ${cwDown.length}</span>`;
+
+          const totP=await sb.from('totale_articoli').select('NumPallet');
+          const pallets=(totP.data||[]).reduce((s,r)=>s+Number(r.NumPallet||0),0);
+          const cap=31540;
+          const sat=cap?Math.round((pallets/cap)*100):0;
+          setGauge('gauge-sat',sat,`${pallets}/${cap}`,'low',{good:50,warn:80});
+
+          const loc=await sb.from('magazzino_stato').select('PRELIEVO_DISABILITATO,DEPOSITO_DISABILITATO,LOCAZIONE');
+          const bloc=(loc.data||[]).filter(r=>r.PRELIEVO_DISABILITATO||r.DEPOSITO_DISABILITATO);
+          const totalDisp=12884;
+          const percBloc=totalDisp?Math.round((bloc.length/totalDisp)*100):0;
+          setGauge('gauge-loc',percBloc,`${bloc.length}/${totalDisp}`,'low',{good:2,warn:5});
+
+        }catch(e){
+          console.error(e);
+        }
+      }
+
+      async function loadPalletDaGestire(){
+        try{
+          let spezz=0;
+          const tables=['spezzature_magazzino','spezzature','t_spezzature','spezzature_totali'];
+          for(const t of tables){
+            const r=await sb.from(t).select('*',{count:'exact'}).limit(1);
+            if(!r.error && typeof r.count==='number'){ spezz=r.count; break; }
+          }
+
+          let scaduti=0;
+          { const r=await sb.from('Pallet_Scaduti').select('*',{count:'exact'}).limit(1);
+            if(!r.error && typeof r.count==='number') scaduti=r.count; }
+
+          let shelfFM=0;
+          { const r=await sb.from('pallet_shelf_life').select('*',{count:'exact'})
+              .or('DescrizioneFamiglia.ilike.%finito%,DescrizioneFamiglia.ilike.%mix%')
+              .limit(1);
+            if(!r.error && typeof r.count==='number') shelfFM=r.count; }
+
+          const tot = spezz + scaduti + shelfFM;
+          $('gest-tot').textContent = tot;
+          $('gest-tot').className = 'value ' + (tot>=100 ? 'danger' : (tot>=40 ? 'warn' : 'ok'));
+          $('gest-mini').innerHTML = [
+            `<span class="kv"><b>Spezzature:</b> ${spezz}</span>`,
+            `<span class="kv"><b>Scaduti:</b> ${scaduti}</span>`,
+            `<span class="kv"><b>ShelfLife finito/mix:</b> ${shelfFM}</span>`
+          ].join(' ');
+        }catch(e){
+          console.error(e);
+          $('gest-tot').textContent='—';
+          $('gest-mini').textContent='—';
+        }
+      }
+
+      async function loadSafety(){
+        const y=new Date().getFullYear();
+        try{
+          const r=await sb.from('indicatori_infortuni')
+            .select('numero_infortuni,giorni_persi_infortunio,segnalazioni_mese,segnalazioni_totali_anno,percentuale_chiusura_anno,data_ultimo_infortunio,anno,mese')
+            .eq('anno',y).order('mese',{ascending:false}).limit(1);
+
+          const d=(r.data||[])[0]||{};
+          const fmt=v=>v==null?'—':String(v);
+          const pct=(d.percentuale_chiusura_anno!=null)?`${Number(d.percentuale_chiusura_anno).toFixed(0)}%`:'—';
+          let giorniSenza='—';
+          if(d.data_ultimo_infortunio){
+            const last=new Date(String(d.data_ultimo_infortunio).split('T')[0]);
+            const today=new Date(); today.setHours(0,0,0,0);
+            const diffMs=today-last;
+            if(!isNaN(diffMs)) giorniSenza=Math.max(0,Math.floor(diffMs/(1000*60*60*24)));
+          }
+
+          const left=[{lab:`Numero infortuni ${y}`,val:fmt(d.numero_infortuni)},{lab:'Giorni senza infortunio',val:fmt(giorniSenza)},{lab:'Giorni persi per infortunio',val:fmt(d.giorni_persi_infortunio)}];
+          const right=[{lab:'Segnalazioni del mese',val:fmt(d.segnalazioni_mese)},{lab:'Tot segnalazioni anno',val:fmt(d.segnalazioni_totali_anno)},{lab:'% chiusura segnalazioni anno',val:pct}];
+          const pill=x=>`<div class="s-pill"><div class="lab">${x.lab}</div><div class="val">${x.val}</div></div>`;
+          $('safety-row').innerHTML=`<div class="safety-col">${left.map(pill).join('')}</div><div class="safety-col">${right.map(pill).join('')}</div>`;
+        }catch(e){ console.error(e); }
+      }
+
+      async function loadQuality(){
+        try{
+          const r=await sb.from('segnalazioni_qualita').select('*').order('creato_il',{ascending:false}).limit(1);
+          const d=(r.data||[])[0]||{};
+          const fmtDate=v=>v?new Date(String(v).split('T')[0]).toLocaleDateString('it-IT'):'—';
+          const fmtTxt=v=>v&&String(v).trim()?String(v).trim():'—';
+          const lines=[
+            {line:81,date:d.data_sanificazione_81,note:d.segnalazione_81},
+            {line:82,date:d.data_sanificazione_82,note:d.segnalazione_82},
+            {line:83,date:d.data_sanificazione_83,note:d.segnalazione_83},
+            {line:84,date:d.data_sanificazione_84,note:d.segnalazione_84}
+          ];
+          $('quality-row').innerHTML=lines.map(x=>`
+            <div class="quality-item" title="${fmtTxt(x.note)}">
+              <div class="q-lab">Linea ${x.line}</div>
+              <div class="q-val">
+                <span class="q-pre">Sanificata il</span><span class="q-date">${fmtDate(x.date)}</span>
+                <span class="q-sep">—</span>
+                <span class="q-pre" style="font-weight:400">Ultima segnalazione:</span><span class="q-note">${fmtTxt(x.note)}</span>
+              </div>
+            </div>
+          `).join('');
+        }catch(e){ console.error(e); }
+      }
+
+      // Meteo (OK lato CORS)
+      async function loadMeteo(){
+        try{
+          const res=await fetch('https://api.open-meteo.com/v1/forecast?latitude=42.05&longitude=13.93&current=temperature_2m,weather_code,wind_speed_10m',{cache:'no-store'});
+          const j=await res.json(); const c=j.current||{};
+          const wmap={0:'Sereno ☀️',1:'Poco nuvoloso 🌤️',2:'Variabile ⛅',3:'Nuvoloso ☁️',45:'Nebbia 🌫️',48:'Nebbia 🌫️',51:'Pioviggine 🌦️',53:'Pioviggine 🌦️',55:'Pioviggine 🌦️',61:'Pioggia 🌧️',63:'Pioggia 🌧️',65:'Pioggia 🌧️',71:'Neve ❄️',73:'Neve ❄️',75:'Neve ❄️',80:'Rovesci 🌧️',81:'Rovesci 🌧️',82:'Rovesci 🌧️',95:'Temporali ⛈️',96:'Temporali ⛈️',99:'Temporali ⛈️'};
+          $('meteo-temp').textContent=(c.temperature_2m!=null?Math.round(c.temperature_2m):'—')+'°C';
+          $('meteo-desc').textContent=wmap[c.weather_code]||'—';
+          $('meteo-wind').textContent='Vento: '+(c.wind_speed_10m!=null?Math.round(c.wind_speed_10m)+' km/h':'—');
+        }catch(e){
+          $('meteo-temp').textContent='—°C';
+          $('meteo-desc').textContent='—';
+          $('meteo-wind').textContent='—';
+        }
+      }
+
+      // NEWS SENZA CORS: prende un file locale ./news.json (opzionale)
+      let newsItems=[],newsIdx=0;
+      async function loadNews(){
+        try{
+          const r=await fetch('./news.json',{cache:'no-store'});
+          if(!r.ok) throw new Error('news.json missing');
+          const j=await r.json();
+          newsItems = (j.items || []).filter(x=>x && x.t && x.l).slice(0,30);
+          if(!newsItems.length) throw new Error('empty');
+          newsIdx=0; renderTicker();
+        }catch(e){
+          newsItems=[{t:'Notizie non disponibili (CORS). Usa ./news.json',l:'#'}];
+          newsIdx=0; renderTicker();
+        }
+      }
+      function renderTicker(){
+        const t=$('news-ticker');
+        if(!t||!newsItems.length){t.textContent='—';return}
+        const it=newsItems[newsIdx%newsItems.length];
+        t.innerHTML = it.l && it.l !== '#'
+          ? `<a href="${it.l}" target="_blank" rel="noopener">${it.t}</a>`
+          : `${it.t}`;
+        newsIdx++;
+      }
+
+      // ROTAZIONE PAGINE
+      const PAGES=[
+        {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/PlantDashboard.aspx',label:'OEEblue – Plant Dashboard'},
+        {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=97',label:'OEEblue – LINEA 81'},
+        {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=100',label:'OEEblue – LINEA 82'},
+        {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=109',label:'OEEblue – LINEA 83'},
+        {url:'https://80.21.24.216:594/OEEblueDashboard_Sulmona/LineDashboard.aspx?MachineID=106',label:'OEEblue – LINEA 84'},
+        {url:'Carwash.html',label:'Carwash'},
+        {url:'shipment.html',label:'Spedizioni'},
+        {url:'fermate.html',label:'Fermate'}
+      ];
+      const INTERVAL=30000;
+      const frame=$('rotor'), urlL=$('url-label');
+      let idx=0, timer=null;
+
+      function show(k){
+        idx=(k+PAGES.length)%PAGES.length;
+        const p=PAGES[idx];
+        urlL.textContent=p.label||p.url;
+        frame.src=p.url;
+      }
+      function next(){ show(idx+1); }
+      function start(){ if(timer) clearInterval(timer); timer=setInterval(next,INTERVAL); }
+      function init(){ show(0); start(); }
+
+      // START
+      init();
+      loadKpi(); setInterval(loadKpi,30000);
+      loadPalletDaGestire(); setInterval(loadPalletDaGestire,60000);
+      loadSafety(); setInterval(loadSafety,300000);
+      loadQuality(); setInterval(loadQuality,300000);
+      loadMeteo(); setInterval(loadMeteo,600000);
+      loadNews(); setInterval(renderTicker,8000); setInterval(loadNews,600000);
+    });
   </script>
 </body>
 </html>
